@@ -4,6 +4,7 @@ import cors from "cors";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import "colors";
 import { fileURLToPath } from "url";
 import PDFDocument from "pdfkit";
 
@@ -301,6 +302,8 @@ app.get("/report/:taskId/pdf", (req, res) => {
 
 //start server
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () =>
-    console.log(`Бэкэнд работает на http://localhost:${PORT}`)
-);
+app.listen(PORT, () => {
+    console.log(
+        "Бэкэнд работает на".green + " " + `http://localhost:${PORT}`.blue
+    );
+});
