@@ -11,15 +11,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", true);
 const upload = multer({ dest: "uploads/" });
 //task created
 const tasks = new Map();
+
 
 //middlewares
 app.use(cors());
 app.use(express.json());
 //optional
 app.use(express.static(path.resolve(__dirname, "public")));
+
 
 //static analys
 const drawingAnalysis = {
@@ -212,7 +215,21 @@ app.get("/report/:taskId", (req, res) => {
         "*Отчёт составлен на основе проектных методик и наблюдений. Является ориентиром для мягкой поддержки ребёнка в развитии.*\n";
 
     //pdf url
-    const pdfUrl = `${req.protocol}://${req.get("host")}/report/${req.params.taskId}/pdf`;
+    const forwarded = req.headers["x-forwarded-proto"];
+    let protoHeader = "";
+
+    if (Array.isArray(forwarded)) {
+        protoHeader = forwarded[0];
+    }
+    else if (typeof forwarded === "string") {
+        protoHeader = forwarded;
+    }
+
+    const protocol = req.secure
+        ? "https"
+        : (protoHeader.split(",")[0] || "http");
+
+    const pdfUrl = `${protocol}://${req.get("host")}/report/${req.params.taskId}/pdf`;
     res.json({ status: "ready", report_md: md, pdf_url: pdfUrl });
 });
 
